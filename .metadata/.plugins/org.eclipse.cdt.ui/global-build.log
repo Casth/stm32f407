@@ -1,126 +1,14 @@
-12:55:12 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
+16:07:56 **** Incremental Build of configuration Debug for project UartTransmitString ****
 make -j16 all 
 arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
+arm-none-eabi-gcc -o "UartTransmitString.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\UartTransmitString\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="UartTransmitString.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: UartTransmitString.elf
  
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
+arm-none-eabi-size  UartTransmitString.elf 
+arm-none-eabi-objdump -h -S UartTransmitString.elf  > "UartTransmitString.list"
    text	   data	    bss	    dec	    hex	filename
-   1064	     16	   1568	   2648	    a58	TimerInputCaptureMode.elf
+   5008	    104	   1904	   7016	   1b68	UartTransmitString.elf
 Finished building: default.size.stdout
  
-Finished building: TimerInputCaptureMode.list
- 
-12:55:27 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-   text	   data	    bss	    dec	    hex	filename
-   1064	     16	   1568	   2648	    a58	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-12:56:10 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1080	     16	   1568	   2664	    a68	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-13:09:48 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1156	     16	   1568	   2740	    ab4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-13:11:46 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1140	     16	   1568	   2724	    aa4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-13:27:31 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1156	     16	   1568	   2740	    ab4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-13:36:25 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1172	     16	   1568	   2756	    ac4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-15:21:30 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-   text	   data	    bss	    dec	    hex	filename
-   1172	     16	   1568	   2756	    ac4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-15:43:15 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1188	     16	   1568	   2772	    ad4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
- 
-15:46:40 **** Incremental Build of configuration Debug for project TimerInputCaptureMode ****
-make -j16 all 
-arm-none-eabi-gcc "../Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DSTM32 -DSTM32F4 -DSTM32F407VGTx -c -I../Inc -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Src/main.d" -MT"Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Src/main.o"
-arm-none-eabi-gcc -o "TimerInputCaptureMode.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Users\u27m71\Documents\80 Workspace\Embedded_Workspace\stm32f407\TimerInputCaptureMode\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TimerInputCaptureMode.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: TimerInputCaptureMode.elf
- 
-arm-none-eabi-size  TimerInputCaptureMode.elf 
-arm-none-eabi-objdump -h -S TimerInputCaptureMode.elf  > "TimerInputCaptureMode.list"
-   text	   data	    bss	    dec	    hex	filename
-   1188	     16	   1568	   2772	    ad4	TimerInputCaptureMode.elf
-Finished building: default.size.stdout
- 
-Finished building: TimerInputCaptureMode.list
+Finished building: UartTransmitString.list
  

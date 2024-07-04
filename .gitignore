@@ -9,11 +9,9 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-# **/.metadata/**
-# **/.settings/**
 **/Debug/**
-# **/Startup/**
-# **/.project
-# **/.cproject
-**/*_FLASH.ld
-**/*_RAM.ld
+**/.history/**
+**/*.tree
+.*
+!.*/
+**/*.log

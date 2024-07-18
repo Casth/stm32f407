@@ -9,19 +9,12 @@ int main(void)
 {
     SetSystemCLockTo16MHz();
 
-    pRCC->AHB1ENR |= (1 << 3); // turn on peripheral clock for GPIO port D
-
     /**
      * Set GPIO PD15 to alternative function mode
      */
+    pRCC->AHB1ENR |= (1 << 3);      // turn on peripheral clock for GPIO port D
     pGPIOD->MODER |= (0b10 << 30);  // set GPIO PD15 in alternate function mode
     pGPIOD->AFRH |= (0b0010 << 28); // set GPIO PD15 to alternate function mode to act as TIM4_CH4 (AF2) according to alternate function mapping in STM32 datasheet
-
-    /**
-     * Set GPIO PD12 to alternative function mode
-     */
-    pGPIOD->MODER |= (0b10 << 24);  // set GPIO PD12 in alternate function mode
-    pGPIOD->AFRH |= (0b0010 << 16); // set GPIO PD12 to alternate function mode to act as TIM4_CH1 (AF2) according to alternate function mapping in STM32 datasheet
 
     /**
      * Set timer TIM4 CH4 (at PD15) to output compare mode with output toggle
@@ -33,24 +26,39 @@ int main(void)
     pTIM4->CCMR2 |= (0b011 << 12); // set output compare to toggle mode with TIM4_CCMR2 OC4M register
     pTIM4->CCER |= (1 << 12);      // enable TIM4 CH4 output in compare mode with TIM4_CCER CC4E register
     pTIM4->CNT = 0;                // clear the counter
-    // pTIM4->CR1 |= (1 << 0);        // enable timer 4
+    pTIM4->CR1 = (1 << 0);         // enable TIM4 timer
 
     /**
-     * Set timer TIM4 CH1 (at PD12) to input capture mode
+     * Set GPIO PC6 to alternative function mode
      */
-    pTIM4->CCMR1 = (0b01 << 0); // set TIM4 CC1 channel to input mode
-    pTIM4->CCER = (1 << 0);     // enable TIM4 CC1 channel
-    pTIM4->CR1 = (1 << 0);      // enable TIM4 timer
-    
+    pRCC->AHB1ENR |= (1 << 2);      // turn on peripheral clock for GPIO port C
+    pGPIOC->MODER |= (0b10 << 12);  // set GPIO PC6 in alternate function mode
+    pGPIOC->AFRL |= (0b0010 << 24); // set GPIO PC6 to alternate function mode to act as TIM3_CH1 (AF2) according to alternate function mapping in STM32 datasheet
+
+    /**
+     * Set timer TIM3 CH1 (at PC6) to input capture mode
+     */
+    pRCC->APB1ENR |= (1 << 1); // enable clock access to TIM3, which is on APB1 bus
+    pTIM3->PSC = 800 - 1;      // set prescaler value
+    // pTIM3->ARR = 1000 - 1;         // set auto-reload value
+    pTIM3->CCMR1 &= ~(0b11 << 0);   // reset CC1S flag (least significant two bits)
+    pTIM3->CCMR1 |= (0b01 << 0);    // set TIM3 CC1 channel to input mode
+    pTIM3->CCMR1 &= ~(0b1111 << 4); // set TIM3 IC1F (input capture filter) to none filter
+    pTIM3->CCER &= ~(0b11 << 1);    // set TIM3 CC1NP and CC1P to capture rising edge
+    pTIM3->CCER |= (1 << 0);        // enable TIM3 CC1 channel
+    pTIM3->CR1 |= (1 << 0);         // enable TIM3 timer
+
     /**
      * Main loop
-    */
-    while(1) {
-    	// wait until the edge is captured
-    	while(!((pTIM4->SR) & (1 << 1)));
+     */
+    while (1)
+    {
+        // wait until the edge is captured
+        while (!((pTIM3->SR) & (1 << 1)))
+            ;
 
         // read the captured value
-        countercapture = pTIM4->CCR1;
+        countercapture = pTIM3->CCR1;
     }
 }
 

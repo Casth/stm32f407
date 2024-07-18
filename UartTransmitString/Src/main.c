@@ -17,22 +17,26 @@
  */
 
 #include <stdint.h>
+#include <math.h>
 #include <stdio.h>
 #include "stm32f407xx.h"
 
 #define APB1_CLK 16000000U
-#define USART_BAUDRATE 115200
+#define USART_BAUDRATE 9600
 
 void uart_write(int ch);
+void SetSystemCLockTo16MHz(void);
 
-int __io_putchar(int ch)
-{
-    uart_write(ch);
-    return ch;
-}
+//int __io_putchar(int ch)
+//{
+//    uart_write(ch);
+//    return ch;
+//}
 
 int main(void)
 {
+	SetSystemCLockTo16MHz();
+
     pRCC->AHB1ENR |= (1 << 3); // turn on peripheral clock for GPIO port D
 
     pGPIOD->MODER |= (0b10 << 16); // set GPIOD pin 8 to alternate function mode
@@ -40,22 +44,56 @@ int main(void)
 
     pRCC->APB1ENR |= (1 << 18); // enable USART3 clock
 
-    pUSART3->BRR |= (APB1_CLK + USART_BAUDRATE / 2) / USART_BAUDRATE; // set baud rate of USART3
+    //pUSART3->BRR |= (APB1_CLK + USART_BAUDRATE / 2) / USART_BAUDRATE; // set baud rate of USART3
+    double div = (double)APB1_CLK / 16 / USART_BAUDRATE;
+    double div_integer;
+    double div_fraction = modf(div, &div_integer);
+    pUSART3->BRR |= ((uint16_t)div_integer << 4);
+    pUSART3->BRR |= ((uint16_t)round(div_fraction * 16) << 0);
+
     pUSART3->CR1 |= (1 << 3);                                         // enable USART3 transmit
     pUSART3->CR1 |= (1 << 13);                                        // enable USART3
 
     while (1)
     {
-        printf("Hello World\n\r");
+    	//printf("Hello World\n\r");
+    	uart_write('X');
     }
 }
 
 void uart_write(int ch)
 {
+
+    // write to transmit data register
+    uint8_t value = ch & 0xFF;
+    pUSART3->DR = value;
+
     // make sure that the transmit data register is empty
     while (!(pUSART3->SR & (1 << 7)))
         ;
+}
 
-    // write to transmit data register
-    pUSART3->DR = (ch & 0xFF);
+
+void SetSystemCLockTo16MHz(void)
+{
+    // enable HSI clock
+    if ((pRCC->CR & (1 << 1)) == 0)
+    {
+        pRCC->CR |= (1 << 0); // set HSION = 1
+
+        while ((pRCC->CR & (1 << 1)) == 0)
+            ; // wait until HSI clock is ready
+    }
+
+    pRCC->CFGR &= ~(0x0F << 4);  // set AHB prescaler to 1 (HPRE)
+    pRCC->CFGR &= ~(0x07 << 10); // set APB1 prescaler to 1 (PPRE1)
+    pRCC->CFGR &= ~(0x07 << 13); // set APB1 prescaler to 1 (PPRE2)
+    pRCC->CFGR &= ~(0x03 << 0);  // set HSI as system clock source (SW)
+
+    pFLASH->ACR |= (1 << 9);     // enable instruction cache (ICEN)
+    pFLASH->ACR |= (1 << 10);    // enable data cache (DCEN)
+    pFLASH->ACR &= ~(0x07 << 0); // reset latency (LATENCY)
+    pFLASH->ACR |= (0b011 << 0); // set latency to three wait states (LATENCY)
+
+    pRCC->CR &= ~(1 << 16); // disable HSE clock (HSEON)
 }

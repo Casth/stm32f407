@@ -1,7 +1,14 @@
-*
-*.*
-*/.*
-*/*.*
-*/*
-!*/Src/*.c
-!*/Src/*.h
+# Ignore
+.metadata
+*/.settings
+*/Debug
+*/Inc
+*/Startup
+*/.cproject
+*/.project
+*.launch
+*.ld
+
+# Allow
+! */Src/*.c
+! */Src/*.h

@@ -27,11 +27,11 @@
 void uart_write(int ch);
 void SetSystemCLockTo16MHz(void);
 
-//int __io_putchar(int ch)
-//{
-//    uart_write(ch);
-//    return ch;
-//}
+int __io_putchar(int ch)
+{
+    uart_write(ch);
+    return ch;
+}
 
 int main(void)
 {
@@ -56,8 +56,8 @@ int main(void)
 
     while (1)
     {
-    	//printf("Hello World\n\r");
-    	uart_write('X');
+    	printf("Hello World\n\r");
+    	//uart_write('X');
     }
 }
 

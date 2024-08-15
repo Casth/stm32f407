@@ -8,6 +8,7 @@
 */.project
 *.launch
 *.ld
+*.json
 
 # Allow
 ! */Src/*.c

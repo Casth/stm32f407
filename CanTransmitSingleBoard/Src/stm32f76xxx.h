@@ -1,12 +1,12 @@
 /*
- * stm32f407xx.h
+ * stm32f76xxx.h
  *
- * Created on: 2024.05.03
+ * Created on: 2024.09.13
  * Author: Lin Li
  */
 
-#ifndef INC_STM32F407XX_H_
-#define INC_STM32F407XX_H_
+#ifndef INC_STM32F76XXX_H_
+#define INC_STM32F76XXX_H_
 
 #include <stdint.h>
 
@@ -28,7 +28,6 @@
 
 /*
  * EXTI Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-EXTI-register-map-STM32F407xx.php
  */
 typedef struct
 {
@@ -44,7 +43,6 @@ EXTI_RegDef_t *pEXTI = ((EXTI_RegDef_t *)EXTI_BASEADDR);
 
 /*
  * SPI Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-SPI-register-map-STM32F407xx.php
  */
 #define SPI2_BASEADDR (APB1PERIPH_BASEADDR + 0x3800) // SPI2 base address (based on APB1)
 #define SPI3_BASEADDR (APB1PERIPH_BASEADDR + 0x3C00) // SPI3 base address (based on APB1)
@@ -79,7 +77,6 @@ SPI_RegDef_t *pSPI6 = ((SPI_RegDef_t *)SPI6_BASEADDR);
 
 /*
  * I2C Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-I2C-register-map-STM32F407xx.php
  */
 #define I2C1_BASEADDR (APB1PERIPH_BASEADDR + 0x5400) // I2C1 base address (base on APB1)
 #define I2C2_BASEADDR (APB1PERIPH_BASEADDR + 0x5800) // I2C2 base address (base on APB1)
@@ -106,7 +103,6 @@ I2C_RegDef_t *pI2C3 = ((I2C_RegDef_t *)I2C3_BASEADDR);
 
 /*
  * USART Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-USART-register-map-STM32F407xx.php
  */
 #define USART2_BASEADDR (APB1PERIPH_BASEADDR + 0x4400) // USART2 base address (based on APB1)
 #define USART3_BASEADDR (APB1PERIPH_BASEADDR + 0x4800) // USART3 base address (based on APB1)
@@ -139,7 +135,6 @@ USART_RegDef_t *pUSART6 = ((USART_RegDef_t *)USART6_BASEADDR);
 
 /*
  * SYSCFG Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-SYSCFG-register-map-STM32F407xx.php
  */
 typedef struct
 {
@@ -157,7 +152,6 @@ SYSCFG_RegDef_t *pSYSCFG = ((SYSCFG_RegDef_t *)SYSCFG_BASEADDR);
 
 /*
  * GPIO Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-GPIO-register-map-STM32F407xx.php
  */
 #define GPIOA_BASEADDR (AHB1PERIPH_BASEADDR + 0x0000) // GPIOA base address (based on AHB1)
 #define GPIOB_BASEADDR (AHB1PERIPH_BASEADDR + 0x0400) // GPIOB base address (based on AHB1)
@@ -208,7 +202,6 @@ GPIO_RegDef_t *pGPIOK = GPIOK;
 
 /*
  * RCC Register
- * source: https://www.learningaboutelectronics.com/Articles/C-structure-code-of-the-RCC-register-map-STM32F407xx.php
  */
 typedef struct
 {
@@ -267,7 +260,6 @@ FLASH_RegDef_t *pFLASH = ((FLASH_RegDef_t *)FLASH_BASEADDR);
 
 /*
  * TIM Register (for TIM2-5)
- * source: http://www.learningaboutelectronics.com/Articles/How-to-create-a-delay-using-a-general-purpose-timer-STM32F446-C.php
  */
 typedef struct
 {
@@ -443,4 +435,4 @@ typedef struct CanBusRxStdFrame {
 } CAN_Rx_StdFrame_t;
 
 
-#endif /* INC_STM32F407XX_H_ */
+#endif /* INC_STM32F76XXX_H_ */

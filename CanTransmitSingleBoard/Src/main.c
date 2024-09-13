@@ -201,23 +201,23 @@ void StartCan1(void)
 void SetSystemCLockTo16MHz(void)
 {
     // enable HSI clock
-    if ((pRCC->CR & (1 << 1)) == 0U)
+    if ((RCC->CR & (1 << 1)) == 0U)
     {
-        pRCC->CR |= (1 << 0); // set HSION = 1
+        RCC->CR |= (1 << 0); // set HSION = 1
 
-        while ((pRCC->CR & (1 << 1)) == 0U)
+        while ((RCC->CR & (1 << 1)) == 0U)
             ; // wait until HSI clock is ready
     }
 
-    pRCC->CFGR &= ~(0x0F << 4);  // set AHB prescaler to 1 (HPRE)
-    pRCC->CFGR &= ~(0x07 << 10); // set APB1 prescaler to 1 (PPRE1)
-    pRCC->CFGR &= ~(0x07 << 13); // set APB1 prescaler to 1 (PPRE2)
-    pRCC->CFGR &= ~(0x03 << 0);  // set HSI as system clock source (SW)
+    RCC->CFGR &= ~(0x0F << 4);  // set AHB prescaler to 1 (HPRE)
+    RCC->CFGR &= ~(0x07 << 10); // set APB1 prescaler to 1 (PPRE1)
+    RCC->CFGR &= ~(0x07 << 13); // set APB1 prescaler to 1 (PPRE2)
+    RCC->CFGR &= ~(0x03 << 0);  // set HSI as system clock source (SW)
 
-    pFLASH->ACR |= (1 << 9);     // enable instruction cache (ICEN)
-    pFLASH->ACR |= (1 << 10);    // enable data cache (DCEN)
-    pFLASH->ACR &= ~(0x07 << 0); // reset latency (LATENCY)
-    pFLASH->ACR |= (0b011 << 0); // set latency to three wait states (LATENCY)
+    FLASH->ACR |= (1 << 9);     // enable instruction cache (ICEN)
+    FLASH->ACR |= (1 << 10);    // enable data cache (DCEN)
+    FLASH->ACR &= ~(0x07 << 0); // reset latency (LATENCY)
+    FLASH->ACR |= (0b011 << 0); // set latency to three wait states (LATENCY)
 
-    pRCC->CR &= ~(1 << 16); // disable HSE clock (HSEON)
+    RCC->CR &= ~(1 << 16); // disable HSE clock (HSEON)
 }

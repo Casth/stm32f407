@@ -4,12 +4,14 @@
 #include "stm32f407xx.h"
 
 #define FLAG_LOOPBACK 0
+#define ID_CAN 0x220
 
 void EnableCan1Pins(void);
+void EnableLedPins(void);
 void InitCan1(void);
 void ConfigCan1Filter(void);
 void SendCan1Message(CAN_Tx_StdFrame_t *tx_frame);
-void ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame);
+uint16_t ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame);
 void StartCan1(void);
 void SetSystemCLockTo16MHz(void);
 
@@ -27,8 +29,8 @@ int main(void)
      * bxCAN1 is located on APB1 (AHB1)
      *
      * Bit timing:
-     * CAN baud rate: 500 kBit/s -> t_bit = 2 ms
-     * STM32 clock frequency: 16 MHz -> t_clk = 0.0625 ms
+     * CAN baud rate: 500 kBit/s -> t_bit = 0.002 ms = 2µs
+     * STM32 clock frequency: 16 MHz -> t_clk = 0.0000625 ms = 0.0625 µs
      * -> duration of 1 bit = 32 clock cycles
      * set prescaler (CAN_BTR > BRP bits) to 2
      * -> 1 TQ = 2 clock cycles
@@ -45,10 +47,11 @@ int main(void)
      * Tx sends message with identifier 0x220
      */
 
-    EnableCan1Pins();   // enable clock for CAN peripheral
-    InitCan1();         // CAN initialization mode
+    EnableCan1Pins(); // enable clock for CAN peripheral
+    EnableLedPins();
+    InitCan1(); // CAN initialization mode
     ConfigCan1Filter(); // filter configuration
-    StartCan1();        // start CAN1 by leaving initialization mode
+    StartCan1(); // start CAN1 by leaving initialization mode
 
     // declare Tx and Rx message
     CAN_Tx_StdFrame_t tx_frame;
@@ -61,6 +64,7 @@ int main(void)
     CAN_Rx_StdFrame_t rx_frame;
 
     /* Loop forever */
+    uint16_t sum_received = 0; // cumulated value of received messages
     while (1)
     {
         // set Tx data frame
@@ -73,14 +77,20 @@ int main(void)
         SendCan1Message(&tx_frame);
 
         // receive message
-        ReceiveCan1Message(&rx_frame);
+        sum_received += ReceiveCan1Message(&rx_frame);
+
+        if (sum_received >= 60000)
+        {
+            sum_received = 0; // reset to prevent overflow
+            GPIOD->ODR ^= (1 << 15);
+        }
     }
 }
 
 void EnableCan1Pins(void)
 {
     // AHB1 activation
-    RCC->AHB1ENR |= (1 << 0); // enable AHB1 bus
+    RCC->AHB1ENR |= (1 << 1); // enable GPIOB on AHB1 bus
 
     // PB9 configuration to AF9
     GPIOB->MODER &= ~(0b11 << 18); // reset PB9 mode
@@ -93,6 +103,16 @@ void EnableCan1Pins(void)
     GPIOB->MODER |= (0b10 << 16);  // set PB8 to alternate mode
     GPIOB->AFRH &= ~(0b1111 << 0); // reset PB8 alternative function
     GPIOB->AFRH |= (0b1001 << 0);  // set PB8 to AF9
+}
+
+void EnableLedPins(void)
+{
+    // AHB1 activation
+    RCC->AHB1ENR |= (1 << 3); // enable GPIOD on AHB1 bus
+
+    // PD15: blue LED
+    GPIOD->MODER &= ~(0b11 << 30); // reset PD15 mode
+    GPIOD->MODER |= (0b01 << 30);  // set PD15 to output mode
 }
 
 void InitCan1(void)
@@ -115,14 +135,11 @@ void InitCan1(void)
           // (0: not in sleep mode, 1: sleep mode)
 
     // >>>>> CAN bit timing <<<<<
-    CAN1->BTR &= ~(0x3FF << 0);   // reset BRP[9:0] (baud rate prescaler)
-    CAN1->BTR |= (1 << 0);        // set BRP[9:0] = 1, and therefore t_q = 2 * t_pclk
-    CAN1->BTR &= ~(0b1111 << 16); // reset TS1[3:0] (time segment 1)
-    CAN1->BTR |= (0b1010 << 16);  // set TS1[3:0] = 10, and therefore t_bs1 = 11 * t_q
-    CAN1->BTR &= ~(0b111 << 20);  // reset TS2[2:0] (time segment 2)
-    CAN1->BTR |= (0b011 << 20);   // set TS2[2:0] = 3, and therefore t_bs2 = 4 * t_q
-    CAN1->BTR &= ~(0b11 << 24);   // reset SJW[1:0] (synchronization jump width)
-    CAN1->BTR |= (0b01 << 24);    // set SJW[1:0] = 1, and therefore t_rjw = 2 * t_q
+    CAN1->BTR &= ~(0x3FFFFFF); // Clear all fields of BTR: BRP, TS1, TS2, SJW
+    CAN1->BTR |= (1 << 0);     // set BRP[9:0] = 1, and therefore t_q = 2 * t_pclk
+    CAN1->BTR |= (10 << 16);   // set TS1[3:0] = 10 (time segment 1), and therefore t_bs1 = 11 * t_q
+    CAN1->BTR |= (3 << 20);    // set TS2[2:0] = 3 (time segment 2), and therefore t_bs2 = 4 * t_q
+    CAN1->BTR |= (1 << 24);    // set SJW[1:0] = 1 (synchronization jump width), and therefore t_rjw = 2 * t_q
 
     // debug: enable loop back mode
     if (FLAG_LOOPBACK)
@@ -133,19 +150,21 @@ void InitCan1(void)
 
 void ConfigCan1Filter(void)
 {
-    CAN1->FMR |= (1 << 0);                    // set FINIT to enter filters init mode
-    CAN1->FMR &= ~(0b11111 << 8);             // reset CAN2SB[5:0]
-    CAN1->FMR |= (0b01111 << 8);              // set CAN2SB[5:0] = 15 to
-                                              // assign filter bank 15-28 to CAN2
-                                              // and assign bank 1-14 to CAN1
-    CAN1->FA1R &= ~(1 << 0);                  // deactivate filter bank 0
-    CAN1->FS1R |= (1 << 0);                   // set filter bank 0 to 32-bit scale
-    CAN1->FM1R &= ~(1 << 0);                  // set filter bank 0 to identifier mask mode
-    CAN1->Filter[0].FR1 = (0x108 << 5) << 16; // set identifier ID to 0x108
-    CAN1->Filter[0].FR2 = (0x108 << 5) << 16; // set identifier mask to 0x108
-    CAN1->FFA1R &= ~(1 << 0);                 // assign filter bank to FIFO 0
-    CAN1->FA1R |= (1 << 0);                   // activate filter bank 0
-    CAN1->FMR &= ~(1 << 0);                   // reset FINIT to exit filter init mode
+    CAN1->FMR |= (1 << 0);        // set FINIT to enter filters init mode
+    CAN1->FMR &= ~(0b11111 << 8); // reset CAN2SB[5:0]
+    CAN1->FMR |= (0b01111 << 8);  // set CAN2SB[5:0] = 15 to
+                                  // assign filter bank 15-28 to CAN2
+                                  // and assign bank 1-14 to CAN1
+    CAN1->FA1R &= ~(1 << 0);      // deactivate filter bank 0
+    CAN1->FS1R |= (1 << 0);       // set filter bank 0 to 32-bit scale
+    CAN1->FM1R &= ~(1 << 0);      // set filter bank 0 to identifier mask mode
+    CAN1->Filter[0].FR1 = (ID_CAN << 5) << 16; // set identifier ID to 0x108
+    CAN1->Filter[0].FR2 = (ID_CAN << 5) << 16; // set identifier mask to 0x108
+    // CAN1->Filter[0].FR1 = ~(0xFFFFFFFF); // set mask to allow all messages
+    // CAN1->Filter[0].FR2 = ~(0xFFFFFFFF); // set mask to allow all messages
+    CAN1->FFA1R &= ~(1 << 0);            // assign filter bank to FIFO 0
+    CAN1->FA1R |= (1 << 0);              // activate filter bank 0
+    CAN1->FMR &= ~(1 << 0);              // reset FINIT to exit filter init mode
 }
 
 void SendCan1Message(CAN_Tx_StdFrame_t *tx_frame)
@@ -168,8 +187,10 @@ void SendCan1Message(CAN_Tx_StdFrame_t *tx_frame)
     CAN1->TxMailbox[0].TIR |= (1 << 0); // set TXRQ bit to request transmission in mailbox
 }
 
-void ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame)
+uint16_t ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame)
 {
+    uint16_t sum = 0;
+
     if ((CAN1->RF0R & (0b11 << 0)) != 0U) // check FMP0[1:0] whether FIFO 0 message is pending
     {
         rx_frame->identifier = (CAN1->RxMailbox[0].RIR >> 21) & 0x7FF; // get message identifier
@@ -187,8 +208,15 @@ void ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame)
         rx_frame->data[6] = (CAN1->RxMailbox[0].RDHR >> 16) & 0xFF;
         rx_frame->data[7] = (CAN1->RxMailbox[0].RDHR >> 24) & 0xFF;
 
+        for (int i = 0; i < 8; i++)
+        {
+            sum += (uint16_t)(rx_frame->data[i]);
+        }
+
         CAN1->RF0R |= (1 << 5); // set RFOM0 to release FIFO 0 mailbox
     }
+
+    return sum;
 }
 
 void StartCan1(void)

@@ -3,8 +3,9 @@
 #include "stdlib.h"
 #include "stm32f407xx.h"
 
-#define FLAG_LOOPBACK 0
-#define ID_CAN 0x220
+#define FLAG_LOOPBACK 1
+#define ID_CAN_TX 0x220
+#define ID_CAN_RX 0x108
 
 void EnableCan1Pins(void);
 void EnableLedPins(void);
@@ -55,7 +56,7 @@ int main(void)
 
     // declare Tx and Rx message
     CAN_Tx_StdFrame_t tx_frame;
-    tx_frame.identifier = 0x220;
+    tx_frame.identifier = ID_CAN_TX;
     tx_frame.length = 8;
     for (int i = 0; i < 8; i++)
     {
@@ -158,8 +159,10 @@ void ConfigCan1Filter(void)
     CAN1->FA1R &= ~(1 << 0);      // deactivate filter bank 0
     CAN1->FS1R |= (1 << 0);       // set filter bank 0 to 32-bit scale
     CAN1->FM1R &= ~(1 << 0);      // set filter bank 0 to identifier mask mode
-    CAN1->Filter[0].FR1 = (ID_CAN << 5) << 16; // set identifier ID to 0x108
-    CAN1->Filter[0].FR2 = (ID_CAN << 5) << 16; // set identifier mask to 0x108
+    // CAN1->Filter[0].FR1 = (ID_CAN_RX << 5) << 16; // set identifier ID to Tx message ID
+    // CAN1->Filter[0].FR2 = (ID_CAN_RX << 5) << 16; // set identifier mask to Tx message ID
+    CAN1->Filter[0].FR1 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
+    CAN1->Filter[0].FR2 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
     // CAN1->Filter[0].FR1 = ~(0xFFFFFFFF); // set mask to allow all messages
     // CAN1->Filter[0].FR2 = ~(0xFFFFFFFF); // set mask to allow all messages
     CAN1->FFA1R &= ~(1 << 0);            // assign filter bank to FIFO 0

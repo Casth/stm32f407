@@ -159,10 +159,10 @@ void ConfigCan1Filter(void)
     CAN1->FA1R &= ~(1 << 0);      // deactivate filter bank 0
     CAN1->FS1R |= (1 << 0);       // set filter bank 0 to 32-bit scale
     CAN1->FM1R &= ~(1 << 0);      // set filter bank 0 to identifier mask mode
-    // CAN1->Filter[0].FR1 = (ID_CAN_RX << 5) << 16; // set identifier ID to Tx message ID
-    // CAN1->Filter[0].FR2 = (ID_CAN_RX << 5) << 16; // set identifier mask to Tx message ID
-    CAN1->Filter[0].FR1 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
-    CAN1->Filter[0].FR2 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
+    CAN1->Filter[0].FR1 = (ID_CAN_RX << 5) << 16; // set identifier ID to Rx message ID
+    CAN1->Filter[0].FR2 = (ID_CAN_RX << 5) << 16; // set identifier mask to Rx message ID
+    // CAN1->Filter[0].FR1 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
+    // CAN1->Filter[0].FR2 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
     // CAN1->Filter[0].FR1 = ~(0xFFFFFFFF);                            // set mask to allow all messages
     // CAN1->Filter[0].FR2 = ~(0xFFFFFFFF);                            // set mask to allow all messages
     CAN1->FFA1R &= ~(1 << 0);                                       // assign filter bank to FIFO 0
@@ -213,7 +213,7 @@ uint16_t ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame)
 
         for (int i = 0; i < 8; i++)
         {
-            sum += (uint16_t)(rx_frame->data[i]);
+            sum += (uint16_t)(rx_frame->data[i] / 2);
         }
 
         CAN1->RF0R |= (1 << 5); // set RFOM0 to release FIFO 0 mailbox

@@ -18,6 +18,7 @@
 #define EXTI_BASEADDR 0x40013C00U                    // EXTI register base address (on APB2)
 #define SYSCFG_BASEADDR 0x40013800U                  // SYSCFG base address (on APB2)
 #define RCC_BASEADDR 0x40023800U                     // RCC base address (on AHB1)
+#define CRC_BASEADDR 0x40023000U                     // CRC base address (on AHB1)
 #define FLASH_BASEADDR 0x40023C00U                   // Flash base address (on AHB1)
 #define TIM2_BASEADDR (APB1PERIPH_BASEADDR + 0x0000) // TIM2 base address
 #define TIM3_BASEADDR (APB1PERIPH_BASEADDR + 0x0400) // TIM3 base address
@@ -442,5 +443,16 @@ typedef struct CanBusRxStdFrame {
     uint8_t data[8];
 } CAN_Rx_StdFrame_t;
 
+/*
+ * CRC Register
+ */
+typedef struct
+{
+    volatile uint32_t DR;
+    volatile uint32_t IDR;
+    volatile uint32_t CR;
+} CRC_RegDef_t;
+#define CRC ((CRC_RegDef_t *)CRC_BASEADDR)
+CRC_RegDef_t *pCRC = ((CRC_RegDef_t *)CRC_BASEADDR);
 
 #endif /* INC_STM32F407XX_H_ */

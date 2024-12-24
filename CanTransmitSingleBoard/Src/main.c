@@ -11,6 +11,7 @@ void EnableCan1Pins(void);
 void EnableLedPins(void);
 void InitCan1(void);
 void ConfigCan1Filter(void);
+uint16_t CalculateCrc(uint8_t *data, uint8_t length);
 void SendCan1Message(CAN_Tx_StdFrame_t *tx_frame);
 uint16_t ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame);
 void StartCan1(void);
@@ -50,18 +51,21 @@ int main(void)
 
     EnableCan1Pins(); // enable clock for CAN peripheral
     EnableLedPins();
-    InitCan1(); // CAN initialization mode
+    InitCan1();         // CAN initialization mode
     ConfigCan1Filter(); // filter configuration
-    StartCan1(); // start CAN1 by leaving initialization mode
+    StartCan1();        // start CAN1 by leaving initialization mode
 
     // declare Tx and Rx message
     CAN_Tx_StdFrame_t tx_frame;
     tx_frame.identifier = ID_CAN_TX;
     tx_frame.length = 8;
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 6; i++)
     {
         tx_frame.data[i] = (uint8_t)i;
     }
+    uint16_t crc = CalculateCrc(tx_frame.data, 6);
+    tx_frame.data[6] = (crc >> 8) & 0xFF; // high byte of CRC
+    tx_frame.data[7] = crc & 0xFF;        // low byte of CRC
     CAN_Rx_StdFrame_t rx_frame;
 
     /* Loop forever */
@@ -151,23 +155,56 @@ void InitCan1(void)
 
 void ConfigCan1Filter(void)
 {
-    CAN1->FMR |= (1 << 0);        // set FINIT to enter filters init mode
-    CAN1->FMR &= ~(0b11111 << 8); // reset CAN2SB[5:0]
-    CAN1->FMR |= (0b01111 << 8);  // set CAN2SB[5:0] = 15 to
-                                  // assign filter bank 15-28 to CAN2
-                                  // and assign bank 1-14 to CAN1
-    CAN1->FA1R &= ~(1 << 0);      // deactivate filter bank 0
-    CAN1->FS1R |= (1 << 0);       // set filter bank 0 to 32-bit scale
-    CAN1->FM1R &= ~(1 << 0);      // set filter bank 0 to identifier mask mode
+    CAN1->FMR |= (1 << 0);                        // set FINIT to enter filters init mode
+    CAN1->FMR &= ~(0b11111 << 8);                 // reset CAN2SB[5:0]
+    CAN1->FMR |= (0b01111 << 8);                  // set CAN2SB[5:0] = 15 to
+                                                  // assign filter bank 15-28 to CAN2
+                                                  // and assign bank 1-14 to CAN1
+    CAN1->FA1R &= ~(1 << 0);                      // deactivate filter bank 0
+    CAN1->FS1R |= (1 << 0);                       // set filter bank 0 to 32-bit scale
+    CAN1->FM1R &= ~(1 << 0);                      // set filter bank 0 to identifier mask mode
     CAN1->Filter[0].FR1 = (ID_CAN_RX << 5) << 16; // set identifier ID to Rx message ID
     CAN1->Filter[0].FR2 = (ID_CAN_RX << 5) << 16; // set identifier mask to Rx message ID
     // CAN1->Filter[0].FR1 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
     // CAN1->Filter[0].FR2 = (((ID_CAN_TX) & (ID_CAN_RX)) << 5) << 16; // set mask to allow Tx and Rx messages
     // CAN1->Filter[0].FR1 = ~(0xFFFFFFFF); // set mask to allow all messages
     // CAN1->Filter[0].FR2 = ~(0xFFFFFFFF); // set mask to allow all messages
-    CAN1->FFA1R &= ~(1 << 0);            // assign filter bank to FIFO 0
-    CAN1->FA1R |= (1 << 0);              // activate filter bank 0
-    CAN1->FMR &= ~(1 << 0);              // reset FINIT to exit filter init mode
+    CAN1->FFA1R &= ~(1 << 0); // assign filter bank to FIFO 0
+    CAN1->FA1R |= (1 << 0);   // activate filter bank 0
+    CAN1->FMR &= ~(1 << 0);   // reset FINIT to exit filter init mode
+}
+
+uint16_t CalculateCrc(uint8_t *data, uint8_t length)
+{
+    uint32_t word = 0; // initial value of word data
+    uint8_t num_word = length / 4;
+    uint8_t num_remaining_bytes = length % 4;
+
+    CRC->CR = 1; // reset CRC unit
+
+    // create 32-bit word data from every 4 bytes
+    for (uint8_t i = 0; i < num_word; i++)
+    {
+        word = ((uint32_t)data[i * 4] << 24) |
+               ((uint32_t)data[i * 4 + 1] << 16) |
+               ((uint32_t)data[i * 4 + 2] << 8) |
+               ((uint32_t)data[i * 4 + 3] << 0);
+        CRC->DR = word; // feed data to CRC data register
+    }
+
+    // pad remaining bytes with zeros
+    if (num_remaining_bytes > 0)
+    {
+        word = 0; // reset to initial value
+        for (uint8_t i = 0; i < num_remaining_bytes; i++)
+        {
+            word |= ((uint32_t)data[num_word * 4 + i] << (24 - i * 8));
+        }
+        CRC->DR = word; // feed data to CRC data register
+    }
+
+    uint32_t crc_value = CRC->DR;
+    return (uint16_t)(crc_value & 0xFFFF); // return lowest 16 bit of CRC value
 }
 
 void SendCan1Message(CAN_Tx_StdFrame_t *tx_frame)
@@ -215,6 +252,12 @@ uint16_t ReceiveCan1Message(CAN_Rx_StdFrame_t *rx_frame)
         {
             sum += (uint16_t)(rx_frame->data[i]);
         }
+
+        uint16_t crc = CalculateCrc(rx_frame->data, 6);
+        uint8_t crc_high = (crc >> 8) & 0xFF;
+        uint8_t crc_low = crc & 0xFF;
+
+        // TODO: compare crc high and low bytes with received data 6 and 7
 
         CAN1->RF0R |= (1 << 5); // set RFOM0 to release FIFO 0 mailbox
     }

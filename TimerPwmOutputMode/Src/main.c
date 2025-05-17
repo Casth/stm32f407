@@ -39,7 +39,7 @@ void Timer4Init(void)
     TIM4->CCMR2 |= (0b110 << 12); // set output compare to PWM mode 1 with TIM4_CCMR2 OC4M register
     TIM4->CCER |= (1 << 12); // enable TIM4 CH4 output in compare mode with TIM4_CCER CC4E register
     TIM4->CNT = 0; // clear the counter
-    // TIM4->CCR4 = 200;	// set CCR1 in ratio to AAR, which corresponds to the duty cycle
+    
     TIM4->CR1 |= (1 << 0); // enable timer 4 CH4
 }
 

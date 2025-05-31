@@ -46,13 +46,13 @@ void Timer4Init(void)
     RCC->AHB1ENR |= (1 << 3); // turn on peripheral clock for GPIO port D
 
     GPIOD->MODER |= (0b10 << 28 | 0b10 << 30); // set GPIO PD14 and PD15 in alternate function mode
-    GPIOD->AFRH |= (0b0010 << 24 | 0b0010 << 28); // set GPIO PD14 and PD15 to AF2 to act as TIM4_CH4
+    GPIOD->AFRH |= (0b0010 << 24 | 0b0010 << 28); // set GPIO PD14 and PD15 to AF2 to act as TIM4_CH3 and CH4
 
     RCC->APB1ENR |= (1 << 2); // enable clock access to TIM4, which is on APB1 bus
     TIM4->PSC = 0; // set prescaler value
     TIM4->ARR = 255; // set auto-reload value
 
-	  TIM4->CCMR2 &= ~(0b11 << 1 | 0b11 << 8);   // select CC3 and CC4 channel as output
+	TIM4->CCMR2 &= ~(0b11 << 1 | 0b11 << 8);   // select CC3 and CC4 channel as output
     TIM4->CCMR2 |= (0b110 << 4 | 0b110 << 12); // set output compare to PWM mode 1
     TIM4->CCER |= (1 << 8 | 1 << 12); // enable TIM4 CH4 output in compare mode
     TIM4->CNT = 0; // clear the counter
